@@ -3,9 +3,9 @@
   "name": "Mem0.ai",
   "favicon": "/logo/favicon.png",
   "colors": {
-    "primary": "#3B2FC9",
-    "light": "#6673FF",
-    "dark": "#3B2FC9",
+    "primary": "#6c60f0",
+    "light": "#E6FFA2",
+    "dark": "#a3df02",
     "background": {
       "dark": "#0f1117",
       "light": "#fff"
@@ -27,9 +27,14 @@
       "url": "https://app.mem0.ai"
     },
     {
+      "name": "API Reference",
+      "url": "api-reference",
+      "icon": "square-terminal"
+    },
+    {
       "name": "Discord",
       "icon": "discord",
-      "url": "https://mem0.ai/discord"
+      "url": "https://mem0.dev/DiD"
     },
     {
       "name": "GitHub",
@@ -47,6 +52,8 @@
       "group": "Get Started",
       "pages": [
         "overview",
+        "quickstart",
+        "playground",
         "features"
       ]
     },
@@ -54,13 +61,22 @@
       "group": "Platform",
       "pages": [
         "platform/overview",
-        "platform/quickstart"
+        "platform/quickstart",
+        {
+          "group": "Features",
+          "pages": ["features/selective-memory", "features/custom-categories", "features/direct-import", "features/async-client"]
+        },
+        "features/langchain-tools"
       ]
     },
     {
       "group": "Open Source",
       "pages": [
         "open-source/quickstart",
+        {
+          "group": "Graph Memory",
+          "pages": ["open-source/graph_memory/overview", "open-source/graph_memory/features"]
+        },
         {
           "group": "LLMs",
           "pages": [
@@ -78,7 +94,8 @@
                 "components/llms/models/litellm",
                 "components/llms/models/mistral_AI",
                 "components/llms/models/google_AI",
-                "components/llms/models/aws_bedrock"
+                "components/llms/models/aws_bedrock",
+                "components/llms/models/gemini"
               ]
             }
           ]
@@ -91,9 +108,12 @@
             {
               "group": "Supported Vector Databases",
               "pages": [
+                "components/vectordbs/dbs/qdrant",
                 "components/vectordbs/dbs/chroma",
                 "components/vectordbs/dbs/pgvector",
-                "components/vectordbs/dbs/qdrant"
+                "components/vectordbs/dbs/milvus",
+                "components/vectordbs/dbs/azure_ai_search",
+                "components/vectordbs/dbs/redis"
               ]
             }
           ]
@@ -109,15 +129,95 @@
                 "components/embedders/models/openai",
                 "components/embedders/models/azure_openai",
                 "components/embedders/models/ollama",
-                "components/embedders/models/huggingface"
+                "components/embedders/models/huggingface",
+                "components/embedders/models/vertexai",
+                "components/embedders/models/gemini"
               ]
             }
           ]
         },
         {
           "group": "Features",
-          "pages": ["features/openai_compatibility"]
+          "pages": ["features/openai_compatibility", "features/custom-prompts"]
         }
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview",
+        {
+          "group": "Memory APIs",
+          "pages": [
+            "api-reference/memory/v1-get-memories",
+            "api-reference/memory/v2-get-memories",
+            "api-reference/memory/add-memories",
+            "api-reference/memory/delete-memories",
+            "api-reference/memory/get-memory",
+            "api-reference/memory/update-memory",
+            "api-reference/memory/delete-memory",
+            "api-reference/memory/v1-search-memories",
+            "api-reference/memory/v2-search-memories",
+            "api-reference/memory/history-memory",
+            "api-reference/memory/batch-update",
+            "api-reference/memory/batch-delete"
+          ]
+        },
+        {
+          "group": "Entities APIs",
+          "pages": [
+            "api-reference/entities/get-users",
+            "api-reference/entities/delete-user"
+          ]
+        },
+        {
+          "group": "Organizations APIs",
+          "pages": [
+            "api-reference/organization/get-orgs",
+            "api-reference/organization/get-org",
+            "api-reference/organization/create-org",
+            "api-reference/organization/delete-org",
+            {
+              "group": "Members APIs",
+              "pages": [
+                "api-reference/organization/get-org-members",
+                "api-reference/organization/add-org-member",
+                "api-reference/organization/update-org-member",
+                "api-reference/organization/delete-org-member"
+              ]
+            }
+          ]
+        },
+        {
+          "group": "Projects APIs",
+          "pages": [
+            "api-reference/project/get-projects",
+            "api-reference/project/get-project",
+            "api-reference/project/create-project",
+            "api-reference/project/delete-project",
+            {
+              "group": "Members APIs",
+              "pages":[
+                "api-reference/project/get-project-members",
+                "api-reference/project/add-project-member",
+                "api-reference/project/update-project-member",
+                "api-reference/project/delete-project-member"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        "integrations/vercel-ai-sdk",
+        "integrations/crewai",
+        "integrations/multion",
+        "integrations/autogen",
+        "integrations/langchain",
+        "integrations/langgraph",
+        "integrations/llama-index"
       ]
     },
     {
@@ -127,28 +227,21 @@
         "examples/mem0-with-ollama",
         "examples/personal-ai-tutor",
         "examples/customer-support-agent",
-        "examples/langgraph",
-        "examples/personal-travel-assistant"
-      ]
-    },
-    {
-      "group": "Knowledge Base",
-      "pages": [
-        "knowledge-base/introduction"
-      ]
-    },
-    {
-      "group": "Integrations",
-      "pages": [
-        "integrations/multion"
+        "examples/personal-travel-assistant",
+        "examples/llama-index-mem0"
       ]
     }
-
   ],
   "footerSocials": {
-    "discord": "https://mem0.ai/discord",
+    "discord": "https://mem0.dev/DiD",
     "x": "https://x.com/mem0ai",
     "github": "https://github.com/mem0ai",
     "linkedin": "https://www.linkedin.com/company/mem0/"
+  },
+  "analytics": {
+    "posthog": {
+      "apiKey": "phc_hgJkUVJFYtmaJqrvf6CYN67TIQ8yhXAkWzUn9AMU4yX",
+      "apiHost": "https://mango.mem0.ai"
+    }
   }
 }

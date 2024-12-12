@@ -1,5 +1,5 @@
 ---
-title: Quickstart
+title: Guide
 description: 'Get started with Mem0 quickly!'
 ---
 
@@ -55,6 +55,28 @@ config = {
 m = Memory.from_config(config)
 ```
   </Tab>
+
+<Tab title="Advanced (Graph Memory)">
+
+```python
+from mem0 import Memory
+
+config = {
+    "graph_store": {
+        "provider": "neo4j",
+        "config": {
+            "url": "neo4j+s://---",
+            "username": "neo4j",
+            "password": "---"
+        }
+    },
+    "version": "v1.1"
+}
+
+m = Memory.from_config(config_dict=config)
+```
+
+</Tab>
 </Tabs>
 
 
@@ -64,10 +86,24 @@ m = Memory.from_config(config)
 ```python Code
 # For a user
 result = m.add("Likes to play cricket on weekends", user_id="alice", metadata={"category": "hobbies"})
+
+# messages = [
+#    {"role": "user", "content": "Hi, I'm Alex. I like to play cricket on weekends."},
+#    {"role": "assistant", "content": "Hello Alex! It's great to know that you enjoy playing cricket on weekends. I'll remember that for future reference."}
+# ]
+# client.add(messages, user_id="alice")
 ```
 
 ```json Output
-{'message': 'ok'}
+{
+    "results": [
+        {"id": "bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", "memory": "Likes to play cricket on weekends", "event": "ADD"}
+    ],
+    "relations": [
+        {"source": "alice", "relationship": "likes_to_play", "target": "cricket"}, 
+        {"source": "alice", "relationship": "plays_on", "target": "weekends"}
+    ]
+}
 ```
 </CodeGroup>
 
@@ -76,39 +112,48 @@ result = m.add("Likes to play cricket on weekends", user_id="alice", metadata={"
 <CodeGroup>
 ```python Code
 # Get all memories
-all_memories = m.get_all()
-```
-
-```json Output
-[
-   {
-      "id":"13efe83b-a8df-4ec0-814e-428d6e8451eb",
-      "memory":"Likes to play cricket on weekends",
-      "hash":"87bcddeb-fe45-4353-bc22-15a841c50308",
-      "metadata":"None",
-      "created_at":"2024-07-26T08:44:41.039788-07:00",
-      "updated_at":"None",
-      "user_id":"alice"
-   }
-]
-```
-</CodeGroup>
-
-<CodeGroup>
-```python Code
-# Get a single memory by ID
-specific_memory = m.get("m1")
+all_memories = m.get_all(user_id="alice")
 ```
 
 ```json Output
 {
-      "id":"13efe83b-a8df-4ec0-814e-428d6e8451eb",
-      "memory":"Likes to play cricket on weekends",
-      "hash":"87bcddeb-fe45-4353-bc22-15a841c50308",
-      "metadata":"None",
-      "created_at":"2024-07-26T08:44:41.039788-07:00",
-      "updated_at":"None",
-      "user_id":"alice"
+    "results": [
+        {
+            "id": "bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", 
+            "memory": "Likes to play cricket on weekends", 
+            "hash": "285d07801ae42054732314853e9eadd7", 
+            "metadata": {"category": "hobbies"}, 
+            "created_at": "2024-10-28T12:32:07.744891-07:00", 
+            "updated_at": None, 
+            "user_id": "alice"
+        }
+    ], 
+    "relations": [
+        {"source": "alice", "relationship": "likes_to_play", "target": "cricket"}, 
+        {"source": "alice", "relationship": "plays_on", "target": "weekends"}
+    ]
+}
+```
+</CodeGroup>
+
+
+<br />
+
+<CodeGroup>
+```python Code
+# Get a single memory by ID
+specific_memory = m.get("bf4d4092-cf91-4181-bfeb-b6fa2ed3061b")
+```
+
+```json Output
+{
+    "id": "bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", 
+    "memory": "Likes to play cricket on weekends", 
+    "hash": "285d07801ae42054732314853e9eadd7", 
+    "metadata": {"category": "hobbies"}, 
+    "created_at": "2024-10-28T12:32:07.744891-07:00", 
+    "updated_at": None, 
+    "user_id": "alice"
 }
 ```
 </CodeGroup>
@@ -121,20 +166,24 @@ related_memories = m.search(query="What are Alice's hobbies?", user_id="alice")
 ```
 
 ```json Output
-[
-   {
-      "id":"ea925981-272f-40dd-b576-be64e4871429",
-      "memory":"Likes to play cricket and plays cricket on weekends.",
-      "hash":"c8809002-25c1-4c97-a3a2-227ce9c20c53",
-      "metadata":{
-         "category":"hobbies"
-      },
-      "score":0.32116443111457704,
-      "created_at":"2024-07-26T10:29:36.630547-07:00",
-      "updated_at":"None",
-      "user_id":"alice"
-   }
-]
+{
+    "results": [
+        {
+            "id": "bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", 
+            "memory": "Likes to play cricket on weekends", 
+            "hash": "285d07801ae42054732314853e9eadd7", 
+            "metadata": {"category": "hobbies"}, 
+            "score": 0.30808347, 
+            "created_at": "2024-10-28T12:32:07.744891-07:00", 
+            "updated_at": None, 
+            "user_id": "alice"
+        }
+    ], 
+    "relations": [
+        {"source": "alice", "relationship": "plays_on", "target": "weekends"}, 
+        {"source": "alice", "relationship": "likes_to_play", "target": "cricket"}
+    ]
+}
 ```
 </CodeGroup>
 
@@ -142,7 +191,7 @@ related_memories = m.search(query="What are Alice's hobbies?", user_id="alice")
 
 <CodeGroup>
 ```python Code
-result = m.update(memory_id="m1", data="Likes to play tennis on weekends")
+result = m.update(memory_id="bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", data="Likes to play tennis on weekends")
 ```
 
 ```json Output
@@ -154,29 +203,29 @@ result = m.update(memory_id="m1", data="Likes to play tennis on weekends")
 
 <CodeGroup>
 ```python Code
-history = m.history(memory_id="m1")
+history = m.history(memory_id="bf4d4092-cf91-4181-bfeb-b6fa2ed3061b")
 ```
 
 ```json Output
 [
-   {
-      "id":"4e0e63d6-a9c6-43c0-b11c-a1bad3fc7abb",
-      "memory_id":"ea925981-272f-40dd-b576-be64e4871429",
-      "old_memory":"None",
-      "new_memory":"Likes to play cricket and plays cricket on weekends.",
-      "event":"ADD",
-      "created_at":"2024-07-26T10:29:36.630547-07:00",
-      "updated_at":"None"
-   },
-   {
-      "id":"548b75f0-f442-44b9-9ca1-772a105abb12",
-      "memory_id":"ea925981-272f-40dd-b576-be64e4871429",
-      "old_memory":"Likes to play cricket and plays cricket on weekends.",
-      "new_memory":"Likes to play tennis on weekends",
-      "event":"UPDATE",
-      "created_at":"2024-07-26T10:29:36.630547-07:00",
-      "updated_at":"2024-07-26T10:32:46.332336-07:00"
-   }
+    {
+        "id": "96d2821d-e551-4089-aa57-9398c421d450", 
+        "memory_id": "bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", 
+        "old_memory": None, 
+        "new_memory": "Likes to play cricket on weekends", 
+        "event": "ADD", 
+        "created_at": "2024-10-28T12:32:07.744891-07:00", 
+        "updated_at": None
+    }, 
+    {
+        "id": "3db4cb58-c0f1-4dd0-b62a-8123068ebfe7", 
+        "memory_id": "bf4d4092-cf91-4181-bfeb-b6fa2ed3061b", 
+        "old_memory": "Likes to play cricket on weekends", 
+        "new_memory": "Likes to play tennis on weekends", 
+        "event": "UPDATE", 
+        "created_at": "2024-10-28T12:32:07.744891-07:00", 
+        "updated_at": "2024-10-28T13:05:46.987978-07:00"
+    }
 ]
 ```
 </CodeGroup>
@@ -184,9 +233,10 @@ history = m.history(memory_id="m1")
 ### Delete Memory
 
 ```python
-m.delete(memory_id="m1") # Delete a memory
-
-m.delete_all(user_id="alice") # Delete all memories
+# Delete a memory by id
+m.delete(memory_id="bf4d4092-cf91-4181-bfeb-b6fa2ed3061b")
+# Delete all memories for a user
+m.delete_all(user_id="alice")
 ```
 
 ### Reset Memory
@@ -197,12 +247,12 @@ m.reset() # Reset all memories
 
 ## Run Mem0 Locally
 
-Please refer the example [Mem0 with Ollama](../examples/mem0-with-ollama) to run Mem0 locally.
+Please refer to the example [Mem0 with Ollama](../examples/mem0-with-ollama) to run Mem0 locally.
 
 
 ## Chat Completion
 
-Mem0 can be easily integrate into chat applications to enhance conversational agents with structured memory. Mem0's APIs are designed to be compatible with OpenAI's, with the goal of making it easy to leverage Mem0 in applications you may have already built.
+Mem0 can be easily integrated into chat applications to enhance conversational agents with structured memory. Mem0's APIs are designed to be compatible with OpenAI's, with the goal of making it easy to leverage Mem0 in applications you may have already built.
 
 If you have a `Mem0 API key`, you can use it to initialize the client. Alternatively, you can initialize Mem0 without an API key if you're using it locally.
 
@@ -222,7 +272,7 @@ messages = [
     "content": "I love indian food but I cannot eat pizza since allergic to cheese."
   },
 ]
-user_id = "deshraj"
+user_id = "alice"
 chat_completion = client.chat.completions.create(messages=messages, model="gpt-4o-mini", user_id=user_id)
 # Memory saved after this will look like: "Loves Indian food. Allergic to cheese and cannot eat pizza."
 
@@ -297,6 +347,40 @@ related_memories = client.search(query, user_id="alex")
 history = client.history(memory_id="m1")
 print(history)
 ```
+
+
+## Contributing
+
+We welcome contributions to Mem0! Here's how you can contribute:
+
+1. Fork the repository and create your branch from `main`.
+2. Clone the forked repository to your local machine.
+3. Install the project dependencies:
+
+   ```bash
+   poetry install
+   ```
+
+4. Install pre-commit hooks:
+
+   ```bash
+   pip install pre-commit  # If pre-commit is not already installed
+   pre-commit install
+   ```
+
+5. Make your changes and ensure they adhere to the project's coding standards.
+
+6. Run the tests locally:
+
+   ```bash
+   poetry run pytest
+   ```
+
+7. If all tests pass, commit your changes and push to your fork.
+8. Open a pull request with a clear title and description.
+
+Please make sure your code follows our coding conventions and is well-documented. We appreciate your contributions to make Mem0 better!
+
 
 If you have any questions, please feel free to reach out to us using one of the following methods:
 
